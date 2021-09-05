@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SharePoint - Startup</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/variaveis.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h2>Cadastre sua startup</h2>
+  <form class="needs-validation" novalidate>
+    <div class="form-group">
+      <label for="nomeStartup">Nome da sua startup:</label>
+      <input type="text" class="form-control" id="nomeStartup" placeholder="Nome da startup" name="nomeStartup" required>
+    </div>
+    <div class="form-group">
+      <label for="dataCriacao">Quando foi criada:</label>
+      <input type="date" class="form-control" id="dataCriacao" placeholder="Data de criação" name="dataCriacao" required>
+    </div>
+    <div class="form-group">
+      <label for="segmento">Qual o segmento:</label>
+      <input type="text" class="form-control" id="segmento" placeholder="Segmento" name="segmento" value="Tecnologia">
+    </div>
+    <div class="form-group">
+      <label for="logoFile">Escolha sua logo(formato JPG):</label>
+      <input type="file" class="form-control-file border" name="logoFile" id="logoFile">
+    </div>
+    <button type="button" class="btn btn-primary" onclick="CadastrarStartup()">Salvar</button>
+  </form>
+</div>
+
+<script>
+
+  function GetBase64(){
+
+    return new Promise((resolve, reject) => {
+      
+      var reader = new FileReader();
+      reader.readAsDataURL(document.getElementById('logoFile').files[0]);
+
+      reader.onload = () => resolve(reader.result.toString());
+      reader.onerror = error => reject(error); 
+      
+    });
+  }
+
+  function CadastrarStartup() {
+
+    var urlFlow = urlWorkflow;
+    var nomeStartup = document.getElementById('nomeStartup').value;
+    var quandoFoiCriado = document.getElementById('dataCriacao').value;
+    var segmento = document.getElementById('segmento').value;
+    var imagemBase64 = "";
+    
+    GetBase64().then(data => {
+        imagemBase64 = data.substring(data.indexOf(',')+1);
+        
+        //grava no SharePoint através do Power Automate
+        $.ajax({
+            contentType: 'application/json',
+            url: urlFlow,
+            type: "POST",
+            data: JSON.stringify({
+              'Title': nomeStartup,
+              'Quandofoicriado': quandoFoiCriado,
+              'Qualosegmento': segmento,
+              'Logo': imagemBase64
+            }),
+            headers: {
+                "Accept": "application/json;odata=verbose",
+                "content-type": "application/json;odata=verbose"
+            },
+            success: function(data) {
+                alert('Startup criada');
+            },
+            error: function(err) {
+                alert('Erro ao criar startup: ' + JSON.stringify(err));
+            }
+        });
+    })
+    .catch(data => alert('Erro ao criar startup: ' + data));
+
+    
+  }
+
+</script>
+
+</body>
+</html>

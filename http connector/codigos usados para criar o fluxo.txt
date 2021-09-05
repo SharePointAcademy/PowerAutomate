@@ -1,0 +1,24 @@
+//estrutura do corpo do post
+{
+    "type": "object",
+    "properties": {
+        "Title": {
+            "type": "string"
+        },
+        "Quandofoicriado": {
+            "type": "string"
+        },
+        "Qualosegmento": {
+            "type": "string"
+        },
+        "Logo": {
+            "type": "string"
+        }
+    }
+}
+
+//converter base64 para binário, ação de criação do arquivo
+base64ToBinary(triggerBody()?['Logo'])
+
+//variavel urlImagem
+concat('https://solucoessa.sharepoint.com/sites/SharePointAcademy',body('Criar_arquivo')?['Path'])
